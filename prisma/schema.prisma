@@ -15,8 +15,8 @@ model Usuario {
   contrasena  String                 @db.VarChar(255)
   activo      Boolean?               @default(true)
   telefono    String?                @db.VarChar(20)
-  id_rol      String?                @db.Char(36)
   foto        String?                @db.VarChar(500)
+  id_rol      String?                @db.Char(36)
   favoritos   Favorito[]             @relation("ClienteFavoritos")
   propiedades Inmueble[]             @relation("PropietarioInmuebles")
   metricas    MetricaAdministrador[]
@@ -29,6 +29,7 @@ model Usuario {
 model TipoInmueble {
   id        String     @id @default(uuid()) @db.Char(36)
   tipo      String     @db.VarChar(100)
+  activo    Boolean?   @default(true)
   inmuebles Inmueble[]
 
   @@map("tipo_inmueble")
@@ -41,6 +42,7 @@ model Ubicacion {
   barrio    String?    @db.VarChar(100)
   latitud   Decimal?   @db.Decimal(10, 7)
   longitud  Decimal?   @db.Decimal(10, 7)
+  activo    Boolean?   @default(true)
   inmuebles Inmueble[]
 
   @@map("ubicacion")
@@ -54,7 +56,7 @@ model Inmueble {
   area_m2          Decimal?       @db.Decimal(10, 2)
   habitaciones     Int?
   banos            Int?
-  activo           String?        @db.VarChar(500)
+  activo           Boolean?       @default(true)
   id_propietario   String         @db.Char(36)
   id_tipo_inmueble String         @db.Char(36)
   id_ubicacion     String         @db.Char(36)
@@ -75,6 +77,7 @@ model FotoInmueble {
   id_inmueble String   @db.Char(36)
   url         String   @db.VarChar(500)
   numero      Int?
+  activo      Boolean? @default(true)
   inmueble    Inmueble @relation(fields: [id_inmueble], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "foto_inmueble_ibfk_1")
 
   @@index([id_inmueble], map: "id_inmueble")
@@ -85,6 +88,7 @@ model Favorito {
   id          String   @id @default(uuid()) @db.Char(36)
   id_cliente  String   @db.Char(36)
   id_inmueble String   @db.Char(36)
+  activo      Boolean? @default(true)
   cliente     Usuario  @relation("ClienteFavoritos", fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorito_ibfk_1")
   inmueble    Inmueble @relation(fields: [id_inmueble], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorito_ibfk_2")
 
@@ -101,6 +105,7 @@ model MetricaAdministrador {
   fecha_creacion              DateTime? @default(now()) @db.DateTime(0)
   fecha_actualizacion         DateTime? @default(now()) @updatedAt @db.DateTime(0)
   id_usuario                  String    @db.Char(36)
+  activo                      Boolean?  @default(true)
   usuario                     Usuario   @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "metricas_administrador_ibfk_1")
 
   @@index([id_usuario], map: "id_usuario")
@@ -110,5 +115,6 @@ model MetricaAdministrador {
 model rol {
   id       String    @id @db.Char(36)
   nombre   String    @unique(map: "nombre") @db.VarChar(100)
+  activo   Boolean?  @default(true)
   usuarios Usuario[]
 }

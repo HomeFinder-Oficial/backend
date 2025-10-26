@@ -17,7 +17,6 @@ import { Roles } from '../decorators/roles.decorator';
 @Controller('users')
 //@UseGuards(JwtAuthGuard, RolesGuard)
 @UseGuards(JwtAuthGuard)
-
 export class UserController {
   constructor(
     private readonly getAllUsersUseCase: GetAllUsersUseCase,
