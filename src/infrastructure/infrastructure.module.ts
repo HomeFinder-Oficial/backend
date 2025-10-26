@@ -30,6 +30,8 @@ import { CoreModule } from '../core/core.module';
 import { USER_REPOSITORY } from '../core/domain/ports/user.repository';
 import { PASSWORD_SERVICE } from '../core/domain/ports/password.service';
 import { TOKEN_SERVICE } from '../core/domain/ports/token.service';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './config/logger.config';
 import { PROPERTY_REPOSITORY } from 'src/core/domain/ports/property.repository';
 import { PROPERTY_TYPE_REPOSITORY } from 'src/core/domain/ports/property-type.repository';
 import { PROPERTY_IMAGE_REPOSITORY } from 'src/core/domain/ports/property-image.repository';
@@ -68,6 +70,7 @@ const adaptersProviders = [
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonConfig),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -106,4 +109,4 @@ const adaptersProviders = [
     TOKEN_SERVICE,
   ],
 })
-export class InfrastructureModule {}
+export class InfrastructureModule { }

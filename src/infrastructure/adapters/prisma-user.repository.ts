@@ -58,12 +58,21 @@ export class PrismaUserRepository implements IUserRepository {
     return count > 0;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(page: number, limit: number): Promise<User[]> {
+    const skip = (page - 1) * limit;
     const users = await this.prisma.usuario.findMany({
-      include: { rol: true },
+      skip,
+      take: limit,
+      orderBy: { nombre: 'asc' },
     });
-    return users.map((u) => new User(u as any));
+    return users.map(this.mapPrismaUserToEntity);
   }
+
+  async count(): Promise<number> {
+    return this.prisma.usuario.count();
+  }
+
+
 
   async update(id: string, data: Partial<User>): Promise<User> {
     const updated = await this.prisma.usuario.update({

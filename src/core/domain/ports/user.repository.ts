@@ -5,9 +5,10 @@ export interface IUserRepository {
   findById(id: string): Promise<User | null>;
   create(data: Partial<User>): Promise<User>;
   existsByEmail(email: string): Promise<boolean>;
-  findAll(): Promise<User[]>;
+  findAll(page: number, limit: number): Promise<User[]>;
   update(id: string, data: Partial<User>): Promise<User>;
   delete(id: string): Promise<void>;
+  count(): Promise<number>;
 }
 
 export const USER_REPOSITORY = 'USER_REPOSITORY';
