@@ -25,9 +25,12 @@ import { CoreModule } from '../core/core.module';
 import { USER_REPOSITORY } from '../core/domain/ports/user.repository';
 import { PASSWORD_SERVICE } from '../core/domain/ports/password.service';
 import { TOKEN_SERVICE } from '../core/domain/ports/token.service';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './config/logger.config';
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonConfig),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -67,4 +70,4 @@ import { TOKEN_SERVICE } from '../core/domain/ports/token.service';
   ],
   exports: [USER_REPOSITORY, PASSWORD_SERVICE, TOKEN_SERVICE],
 })
-export class InfrastructureModule {}
+export class InfrastructureModule { }
