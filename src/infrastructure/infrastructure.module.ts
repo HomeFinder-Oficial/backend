@@ -14,6 +14,7 @@ import { PrismaUserRepository } from './adapters/prisma-user.repository';
 
 // HTTP Server
 import { AuthController } from './http-server/controllers/auth.controller';
+import { UserController } from './http-server/controllers/user.controller';
 import { JwtStrategy } from './http-server/strategies/jwt.strategy';
 import { JwtAuthGuard } from './http-server/guards/jwt-auth.guard';
 
@@ -36,9 +37,7 @@ import { TOKEN_SERVICE } from '../core/domain/ports/token.service';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: Number(
-            configService.get<string>('JWT_EXPIRATION_SECONDS'),
-          ),
+          expiresIn: Number(configService.get<string>('JWT_EXPIRATION_SECONDS')),
         },
       }),
       inject: [ConfigService],
@@ -46,7 +45,7 @@ import { TOKEN_SERVICE } from '../core/domain/ports/token.service';
     DatabaseModule,
     CoreModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
   providers: [
     {
       provide: PASSWORD_SERVICE,
