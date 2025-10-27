@@ -5,7 +5,7 @@ import { User } from '../../core/domain/entities/user.entity';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private mapPrismaUserToEntity(prismaUser: any): User {
     return new User({
@@ -61,12 +61,14 @@ export class PrismaUserRepository implements IUserRepository {
   async findAll(page: number, limit: number): Promise<User[]> {
     const skip = (page - 1) * limit;
     const users = await this.prisma.usuario.findMany({
+      where: { activo: true },
       skip,
       take: limit,
       orderBy: { nombre: 'asc' },
     });
-    return users.map(this.mapPrismaUserToEntity);
+    return users.map((u) => this.mapPrismaUserToEntity(u));
   }
+
 
   async count(): Promise<number> {
     return this.prisma.usuario.count();
@@ -83,6 +85,10 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.usuario.delete({ where: { id } });
+    await this.prisma.usuario.update({
+      where: { id },
+      data: { activo: false },
+    });
   }
+
 }

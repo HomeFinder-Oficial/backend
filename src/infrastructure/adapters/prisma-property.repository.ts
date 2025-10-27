@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { IPropertyRepository } from 'src/core/domain/ports/property.repository';
 import { Property } from 'src/core/domain/entities/property.entity';
+import { FilterPropertyDto } from 'src/core/application/dto/filter-property.dto';
 
 @Injectable()
 export class PrismaPropertyRepository implements IPropertyRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private mapPrismaPropertyToEntity(prismaProperty: any): Property {
     return new Property({
@@ -29,6 +30,7 @@ export class PrismaPropertyRepository implements IPropertyRepository {
 
   async findAll(): Promise<Property[]> {
     const properties = await this.prisma.inmueble.findMany({
+      where: { activo: true },
       include: {
         propietario: {
           select: {
@@ -137,6 +139,67 @@ export class PrismaPropertyRepository implements IPropertyRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.inmueble.delete({ where: { id } });
+    await this.prisma.inmueble.update({
+      where: { id },
+      data: { activo: false },
+    });
+  }
+
+
+  async searchWithFilters(
+    filters: FilterPropertyDto,
+    skip: number,
+    limit: number,
+  ): Promise<{ data: Property[]; total: number }> {
+    const where: any = { activo: true };
+
+    // 🔍 Filtros dinámicos
+    if (filters.ubicacion) {
+      where.ubicacion = {
+        ciudad: { contains: filters.ubicacion },
+      };
+    }
+    if (filters.minPrecio || filters.maxPrecio) {
+      where.precio = {};
+      if (filters.minPrecio) where.precio.gte = filters.minPrecio;
+      if (filters.maxPrecio) where.precio.lte = filters.maxPrecio;
+    }
+    if (filters.habitaciones) {
+      where.habitaciones = filters.habitaciones;
+    }
+    if (filters.tipo) {
+      where.tipoInmueble = {
+        tipo: { contains: filters.tipo },
+      };
+    }
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.inmueble.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          propietario: {
+            select: {
+              id: true,
+              nombre: true,
+              apellidos: true,
+              email: true,
+              telefono: true,
+            },
+          },
+          tipoInmueble: true,
+          ubicacion: true,
+          fotos: { orderBy: { numero: 'asc' } },
+        },
+        orderBy: { id: 'desc' },
+      }),
+      this.prisma.inmueble.count({ where }),
+    ]);
+
+    return {
+      data: data.map((i) => this.mapPrismaPropertyToEntity(i)),
+      total,
+    };
   }
 }
