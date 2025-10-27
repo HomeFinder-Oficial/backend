@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 import { CreatePropertyUseCase } from 'src/core/application/use-cases/create-property.use-case';
 import { GetAllPropertiesUseCase } from 'src/core/application/use-cases/get-all-properties.use-case';
@@ -16,6 +17,8 @@ import { Public } from '../decorators/public.decorator';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { CreatePropertyDto } from 'src/core/application/dto/create-property.dto';
 import { UpdatePropertyDto } from 'src/core/application/dto/update-property.dto';
+import { SearchPropertiesUseCase } from 'src/core/application/use-cases/search-properties.use-case';
+import { FilterPropertyDto } from 'src/core/application/dto/filter-property.dto';
 
 @Controller('properties')
 export class PropertyController {
@@ -25,7 +28,8 @@ export class PropertyController {
     private readonly getPropertyByIdUseCase: GetPropertyByIdUseCase,
     private readonly updatePropertyUseCase: UpdatePropertyUseCase,
     private readonly deletePropertyUseCase: DeletePropertyUseCase,
-  ) {}
+    private readonly searchPropertiesUseCase: SearchPropertiesUseCase,
+  ) { }
 
   @Public()
   @Get()
@@ -34,6 +38,16 @@ export class PropertyController {
     return {
       message: 'Lista de inmuebles',
       data: properties,
+    };
+  }
+
+  @Public()
+  @Get('search')
+  async search(@Query() filters: FilterPropertyDto) {
+    const result = await this.searchPropertiesUseCase.execute(filters);
+    return {
+      message: 'Búsqueda de inmuebles exitosa',
+      ...result,
     };
   }
 
