@@ -24,7 +24,7 @@ export class PrismaFavoritoRepository implements IFavoritoRepository {
     });
   }
 
-  // 🔹 Borrado lógico: se marca como inactivo
+  
   async removeFavorite(userId: string, propertyId: string): Promise<void> {
     await this.prisma.favorito.updateMany({
       where: {
