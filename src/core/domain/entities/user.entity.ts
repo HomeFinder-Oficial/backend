@@ -1,30 +1,30 @@
 export class User {
   id: string;
-  nombre: string;
-  apellidos: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  contrasena: string;
-  activo: boolean;
-  telefono?: string | null;
-  id_rol?: string | null;
-  foto?: string | null;
+  password: string;
+  active: boolean;
+  phone?: string | null;
+  role_id?: string | null;
+  photo?: string | null;
 
-  constructor(partial: Partial<User> & { activo?: boolean | null }) {
+  constructor(partial: Partial<User> & { active?: boolean | null }) {
     Object.assign(this, {
       ...partial,
-      activo: partial.activo ?? true,
-      telefono: partial.telefono ?? undefined,
-      id_rol: partial.id_rol ?? undefined,
-      foto: partial.foto ?? undefined,
+      active: partial.active ?? true,
+      phone: partial.phone ?? undefined,
+      role_id: partial.role_id ?? undefined,
+      photo: partial.photo ?? undefined,
     });
   }
 
   isActive(): boolean {
-    return this.activo;
+    return this.active;
   }
 
   toSafeObject() {
-    const { contrasena, ...safeUser } = this;
+    const { password, ...safeUser } = this;
     return safeUser;
   }
 }

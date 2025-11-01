@@ -12,9 +12,9 @@ import { GetPropertyByIdUseCase } from './application/use-cases/get-property-by-
 import { UpdatePropertyUseCase } from './application/use-cases/update-property.use-case';
 import { DeletePropertyUseCase } from './application/use-cases/delete-property.use-case';
 import { SearchPropertiesUseCase } from './application/use-cases/search-properties.use-case';
-import { AddFavoritoUseCase } from './application/use-cases/add-favorite.use-case';
-import { GetUserFavoritosUseCase } from './application/use-cases/get-user-favorites.use-case';
-import { RemoveFavoritoUseCase } from './application/use-cases/remove-favorite.use-case';
+import { AddFavoriteUseCase } from './application/use-cases/add-favorite.use-case';
+import { GetUserFavoritesUseCase } from './application/use-cases/get-user-favorites.use-case';
+import { RemoveFavoriteUseCase } from './application/use-cases/remove-favorite.use-case';
 
 @Module({
   imports: [forwardRef(() => InfrastructureModule)],
@@ -34,9 +34,9 @@ import { RemoveFavoritoUseCase } from './application/use-cases/remove-favorite.u
     UpdatePropertyUseCase,
     DeletePropertyUseCase,
     SearchPropertiesUseCase,
-    AddFavoritoUseCase,
-    GetUserFavoritosUseCase,
-    RemoveFavoritoUseCase,
+    AddFavoriteUseCase,
+    GetUserFavoritesUseCase,
+    RemoveFavoriteUseCase,
   ],
   exports: [
     // Auth
@@ -54,9 +54,9 @@ import { RemoveFavoritoUseCase } from './application/use-cases/remove-favorite.u
     UpdatePropertyUseCase,
     DeletePropertyUseCase,
     SearchPropertiesUseCase,
-    AddFavoritoUseCase,
-    GetUserFavoritosUseCase,
-    RemoveFavoritoUseCase
+    AddFavoriteUseCase,
+    GetUserFavoritesUseCase,
+    RemoveFavoriteUseCase
   ],
 })
 export class CoreModule {}

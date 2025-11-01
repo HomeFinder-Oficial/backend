@@ -1,35 +1,40 @@
 export class Property {
   id: string;
-  titulo: string;
-  descripcion?: string | null;
-  precio?: number | null;
+  title: string;
+  description?: string | null;
+  price?: number | null;
   area_m2?: number | null;
-  habitaciones?: number | null;
-  banos?: number | null;
-  activo: boolean;
-  id_propietario: string;
-  id_tipo_inmueble: string;
-  id_ubicacion: string;
-  propietario?: any;
-  tipoInmueble?: any;
-  ubicacion?: any;
-  fotos?: any[];
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  active: boolean;
+  id_owner: string;
+  property_type_id: string;
+  location_id: string;
+  type_of_sale?: 'sold' | 'rented' | null;
+  user?: any;
+  property_type?: any;
+  location?: any;
+  favorite?: any[];
+  property_photo?: any[];
 
   constructor(partial: Partial<Property>) {
-    Object.assign(this, partial);
+    Object.assign(this, {
+      ...partial,
+      active: partial.active ?? true,
+    });
   }
 
   isActive(): boolean {
-    return this.activo;
+    return this.active;
   }
 
   belongsTo(userId: string): boolean {
-    return this.id_propietario === userId;
+    return this.id_owner === userId;
   }
 
   toPriceNumber(): number | null {
-    if (!this.precio) return null;
-    return typeof this.precio === 'object' ? Number(this.precio) : this.precio;
+    if (!this.price) return null;
+    return typeof this.price === 'object' ? Number(this.price) : this.price;
   }
 
   toAreaNumber(): number | null {

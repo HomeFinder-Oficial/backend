@@ -2,48 +2,49 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { IPropertyImageRepository } from 'src/core/domain/ports/property-image.repository';
 import { PropertyImage } from 'src/core/domain/entities/property-image.entity';
-
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class PrismaPropertyImageRepository implements IPropertyImageRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private mapPrismaPropertyImageToEntity(prismaImage: any): PropertyImage {
     return new PropertyImage({
       id: prismaImage.id,
-      id_inmueble: prismaImage.id_inmueble,
+      property_id: prismaImage.property_id,
       url: prismaImage.url,
-      numero: prismaImage.numero ?? undefined,
-      activo: prismaImage.activo === null ? true : prismaImage.activo,
+      number: prismaImage.number ?? null,
+      active: prismaImage.active ?? true,
     });
   }
 
-  async findByProperty(id_inmueble: string): Promise<PropertyImage[]> {
-    const fotos = await this.prisma.fotoInmueble.findMany({
-      where: { id_inmueble },
-      orderBy: { numero: 'asc' },
+  async findByProperty(property_id: string): Promise<PropertyImage[]> {
+    const photos = await this.prisma.property_photo.findMany({
+      where: { property_id },
+      orderBy: { number: 'asc' },
     });
-    return fotos.map((f) => this.mapPrismaPropertyImageToEntity(f));
+    return photos.map((p) => this.mapPrismaPropertyImageToEntity(p));
   }
 
   async create(data: Partial<PropertyImage>): Promise<PropertyImage> {
-    const created = await this.prisma.fotoInmueble.create({
+    const created = await this.prisma.property_photo.create({
       data: {
-        id_inmueble: data.id_inmueble!,
+        id: data.id ?? uuidv4(),
+        property_id: data.property_id!,
         url: data.url!,
-        numero: data.numero ?? null,
-        activo: data.activo ?? true,
+        number: data.number ?? null,
+        active: data.active ?? true,
       },
     });
     return this.mapPrismaPropertyImageToEntity(created);
   }
 
-  async deleteByProperty(id_inmueble: string): Promise<void> {
-    await this.prisma.fotoInmueble.deleteMany({
-      where: { id_inmueble },
+  async deleteByProperty(property_id: string): Promise<void> {
+    await this.prisma.property_photo.deleteMany({
+      where: { property_id },
     });
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.fotoInmueble.delete({ where: { id } });
+    await this.prisma.property_photo.delete({ where: { id } });
   }
 }

@@ -4,29 +4,29 @@ import { Type } from 'class-transformer';
 export class FilterPropertyDto {
   @IsOptional()
   @IsString()
-  ubicacion?: string;
+  location?: string;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  minPrecio?: number;
+  minPrice?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  maxPrecio?: number;
+  maxPrice?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  habitaciones?: number;
+  bedrooms?: number;
 
   @IsOptional()
   @IsString()
-  tipo?: string;
+  type?: string;
 
   @IsOptional()
   @Type(() => Number)

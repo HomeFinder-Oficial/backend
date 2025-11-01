@@ -30,15 +30,15 @@ export class RegisterUseCase {
 
     // Hash de la contraseña
     const hashedPassword = await this.passwordService.hash(
-      registerDto.contrasena,
+      registerDto.password,
     );
 
     // Crear usuario
     const newUser = await this.userRepository.create({
       ...registerDto,
-      contrasena: hashedPassword,
-      activo: true,
-      foto: this.DEFAULT_AVATAR,
+      password: hashedPassword,
+      active: true,
+      photo: this.DEFAULT_AVATAR,
     });
 
     return newUser;

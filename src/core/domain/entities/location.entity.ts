@@ -1,17 +1,17 @@
 export class Location {
   id: string;
-  direccion?: string | null;
-  ciudad?: string | null;
-  barrio?: string | null;
-  latitud?: number | null;
-  longitud?: number | null;
-  activo: boolean;
+  address?: string | null;
+  city?: string | null;
+  neighborhood?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  active: boolean;
 
   constructor(partial: Partial<Location>) {
     Object.assign(this, partial);
   }
 
   isActive(): boolean {
-    return this.activo;
+    return this.active;
   }
 }

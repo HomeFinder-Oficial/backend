@@ -1,68 +1,75 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
-import type { IFavoritoRepository } from '../../core/domain/ports/favorite.repository';
-import { Favorito } from '../../core/domain/entities/favorito.entity';
-
+import type { IFavoriteRepository } from '../../core/domain/ports/favorite.repository';
+import { Favorite } from '../../core/domain/entities/favorite.entity';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
-export class PrismaFavoritoRepository implements IFavoritoRepository {
-  constructor(private readonly prisma: PrismaService) {}
+export class PrismaFavoriteRepository implements IFavoriteRepository {
+  constructor(private readonly prisma: PrismaService) { }
 
-  async addFavorite(userId: string, propertyId: string): Promise<Favorito> {
-    const favorito = await this.prisma.favorito.create({
+  async addFavorite(userId: string, propertyId: string): Promise<Favorite> {
+    const favorite = await this.prisma.favorite.create({
       data: {
-        id_cliente: userId,
-        id_inmueble: propertyId,
-        activo: true,
+        id: uuidv4(),
+        client_id: userId,
+        property_id: propertyId,
+        active: true,
       },
     });
 
-    return new Favorito({
-      id: favorito.id,
-      id_cliente: favorito.id_cliente,
-      id_inmueble: favorito.id_inmueble,
-      activo: favorito.activo ?? true,
+    return new Favorite({
+      id: favorite.id,
+      client_id: favorite.client_id,
+      property_id: favorite.property_id,
+      active: favorite.active ?? true,
     });
   }
 
-  
   async removeFavorite(userId: string, propertyId: string): Promise<void> {
-    await this.prisma.favorito.updateMany({
+    await this.prisma.favorite.updateMany({
       where: {
-        id_cliente: userId,
-        id_inmueble: propertyId,
-        activo: true,
+        client_id: userId,
+        property_id: propertyId,
+        active: true,
       },
       data: {
-        activo: false,
+        active: false,
       },
     });
   }
 
-  async getFavoritesByUser(userId: string): Promise<Favorito[]> {
-    const favoritos = await this.prisma.favorito.findMany({
-      where: { id_cliente: userId, activo: true },
+  async getFavoritesByUser(userId: string): Promise<Favorite[]> {
+    const favorites = await this.prisma.favorite.findMany({
+      where: { client_id: userId, active: true },
       include: {
-        inmueble: {
+        property: {
           include: {
-            tipoInmueble: true,
-            ubicacion: true,
-            fotos: true,
+            property_type: true,
+            location: true,
+            property_photo: true,
           },
         },
       },
     });
 
-    return favoritos.map((fav) => new Favorito({
-      id: fav.id,
-      id_cliente: fav.id_cliente,
-      id_inmueble: fav.id_inmueble,
-      activo: fav.activo ?? true,
-    }));
+    return favorites.map(
+      (fav) =>
+        new Favorite({
+          id: fav.id,
+          client_id: fav.client_id,
+          property_id: fav.property_id,
+          active: fav.active ?? true,
+        }),
+    );
   }
 
   async isFavorite(userId: string, propertyId: string): Promise<boolean> {
-    const count = await this.prisma.favorito.count({
-      where: { id_cliente: userId, id_inmueble: propertyId, activo: true },
+    const count = await this.prisma.favorite.count({
+      where: {
+        client_id: userId,
+        property_id: propertyId,
+        active: true,
+      },
     });
     return count > 0;
   }

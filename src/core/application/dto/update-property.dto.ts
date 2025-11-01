@@ -12,17 +12,17 @@ import { CreateLocationDto } from './create-location.dto';
 export class UpdatePropertyDto {
   @IsString()
   @IsOptional()
-  titulo?: string;
+  title?: string;
 
   @IsString()
   @IsOptional()
-  descripcion?: string;
+  description?: string;
 
   @IsNumber()
   @IsPositive()
   @IsOptional()
   @Type(() => Number)
-  precio?: number;
+  price?: number;
 
   @IsNumber()
   @IsPositive()
@@ -34,28 +34,28 @@ export class UpdatePropertyDto {
   @Min(0)
   @IsOptional()
   @Type(() => Number)
-  habitaciones?: number;
+  bedrooms?: number;
 
   @IsNumber()
   @Min(0)
   @IsOptional()
   @Type(() => Number)
-  banos?: number;
+  bathrooms?: number;
 
   @IsString()
   @IsOptional()
-  activo?: string;
+  active?: string;
 
   @IsString()
   @IsOptional()
-  id_tipo_inmueble?: string;
+  property_type_id?: string;
 
   @IsOptional()
   @Type(() => CreateLocationDto)
-  ubicacion?: CreateLocationDto;
+  location?: CreateLocationDto;
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  fotos?: string[];
+  images?: string[];
 }

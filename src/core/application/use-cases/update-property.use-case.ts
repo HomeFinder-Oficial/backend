@@ -25,8 +25,8 @@ export class UpdatePropertyUseCase {
     @Inject(PROPERTY_TYPE_REPOSITORY)
     private readonly propertyTypeRepository: IPropertyTypeRepository,
     @Inject(PROPERTY_IMAGE_REPOSITORY)
-    private readonly photoRepository: IPropertyImageRepository,
-  ) {}
+    private readonly imageRepository: IPropertyImageRepository,
+  ) { }
 
   async execute(
     propertyId: string,
@@ -35,56 +35,54 @@ export class UpdatePropertyUseCase {
   ): Promise<Property> {
     const property = await this.propertyRepository.findById(propertyId);
     if (!property) {
-      throw new NotFoundException('Inmueble no encontrado');
+      throw new NotFoundException('Property not found');
     }
 
     if (!property.belongsTo(userId)) {
-      throw new ForbiddenException(
-        'No tienes permiso para actualizar el inmueble',
-      );
+      throw new ForbiddenException('You are not allowed to update this property');
     }
 
-    if (dto.ubicacion) {
-      await this.locationRepository.update(property.id_ubicacion, {
-        direccion: dto.ubicacion.direccion,
-        ciudad: dto.ubicacion.ciudad,
-        barrio: dto.ubicacion.barrio,
-        latitud: dto.ubicacion.latitud,
-        longitud: dto.ubicacion.longitud,
+    if (dto.location) {
+      await this.locationRepository.update(property.location_id, {
+        address: dto.location.address,
+        city: dto.location.city,
+        neighborhood: dto.location.neighborhood,
+        latitude: dto.location.latitude,
+        longitude: dto.location.longitude,
       });
     }
 
-    if (dto.fotos !== undefined) {
-      await this.photoRepository.deleteByProperty(propertyId);
+    if (dto.images !== undefined) {
+      await this.imageRepository.deleteByProperty(propertyId);
 
-      if (dto.fotos.length > 0) {
-        for (let i = 0; i < dto.fotos.length; i++) {
-          await this.photoRepository.create({
-            id_inmueble: propertyId,
-            url: dto.fotos[i],
-            numero: i + 1,
+      if (dto.images.length > 0) {
+        for (let i = 0; i < dto.images.length; i++) {
+          await this.imageRepository.create({
+            property_id: propertyId,
+            url: dto.images[i],
+            number: i + 1,
           });
         }
       }
     }
 
-    if (dto.id_tipo_inmueble) {
+    if (dto.property_type_id) {
       const typeExists = await this.propertyTypeRepository.findById(
-        dto.id_tipo_inmueble,
+        dto.property_type_id,
       );
       if (!typeExists) {
-        throw new NotFoundException('Tipo de inmueble no encontrado');
+        throw new NotFoundException('Property type not found');
       }
     }
 
     const updatedProperty = await this.propertyRepository.update(propertyId, {
-      titulo: dto.titulo,
-      descripcion: dto.descripcion,
-      precio: dto.precio,
+      title: dto.title,
+      description: dto.description,
+      price: dto.price,
       area_m2: dto.area_m2,
-      habitaciones: dto.habitaciones,
-      banos: dto.banos,
-      id_tipo_inmueble: dto.id_tipo_inmueble,
+      bedrooms: dto.bedrooms,
+      bathrooms: dto.bathrooms,
+      property_type_id: dto.property_type_id,
     });
 
     return updatedProperty;

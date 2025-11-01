@@ -20,7 +20,7 @@ export class DeletePropertyUseCase {
     private readonly locationRepository: ILocationRepository,
     @Inject(PROPERTY_IMAGE_REPOSITORY)
     private readonly photoRepository: IPropertyImageRepository,
-  ) {}
+  ) { }
 
   async execute(propertyId: string, userId: string): Promise<void> {
     const property = await this.propertyRepository.findById(propertyId);
@@ -38,6 +38,6 @@ export class DeletePropertyUseCase {
 
     await this.propertyRepository.delete(propertyId);
 
-    await this.locationRepository.delete(property.id_ubicacion);
+    await this.locationRepository.delete(property.location_id);
   }
 }
