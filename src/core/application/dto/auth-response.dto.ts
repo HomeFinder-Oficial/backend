@@ -2,12 +2,12 @@ export class AuthResponseDto {
   access_token: string;
   user: {
     id: string;
-    nombre: string;
-    apellidos: string;
+    first_name: string;
+    last_name: string;
     email: string;
-    activo: boolean;
-    telefono?: string | null;
-    id_rol?: string | null;
-    foto?: string | null;
+    active: boolean;
+    phone?: string | null;
+    role_id?: string | null;
+    photo?: string | null;
   };
 }

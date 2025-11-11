@@ -1,10 +1,10 @@
-import type { Favorito } from '../entities/favorito.entity';
+import type { Favorite } from '../entities/favorite.entity';
 
-export interface IFavoritoRepository {
-  addFavorite(userId: string, propertyId: string): Promise<Favorito>;
+export interface IFavoriteRepository {
+  addFavorite(userId: string, propertyId: string): Promise<Favorite>;
   removeFavorite(userId: string, propertyId: string): Promise<void>;
-  getFavoritesByUser(userId: string): Promise<Favorito[]>;
+  getFavoritesByUser(userId: string): Promise<Favorite[]>;
   isFavorite(userId: string, propertyId: string): Promise<boolean>;
 }
 
-export const FAVORITO_REPOSITORY = 'FAVORITO_REPOSITORY';
+export const FAVORITE_REPOSITORY = 'FAVORITE_REPOSITORY';

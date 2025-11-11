@@ -33,8 +33,8 @@ export class LoginUseCase {
 
     // Verificar contraseña
     const isPasswordValid = await this.passwordService.compare(
-      loginDto.contrasena,
-      user.contrasena,
+      loginDto.password,
+      user.password,
     );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -44,7 +44,7 @@ export class LoginUseCase {
     const payload = {
       sub: user.id,
       email: user.email,
-      id_rol: user.id_rol,
+      role_id: user.role_id,
     };
     const access_token = await this.tokenService.generateToken(payload);
 

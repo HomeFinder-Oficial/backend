@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { IFavoritoRepository } from '../../domain/ports/favorite.repository';
-import { FAVORITO_REPOSITORY } from '../../domain/ports/favorite.repository';
-import type { Favorito } from 'src/core/domain/entities/favorito.entity';
+import type { IFavoriteRepository } from '../../domain/ports/favorite.repository';
+import { FAVORITE_REPOSITORY } from '../../domain/ports/favorite.repository';
+import type { Favorite } from 'src/core/domain/entities/favorite.entity';
 
 @Injectable()
-export class GetUserFavoritosUseCase {
+export class GetUserFavoritesUseCase {
   constructor(
-    @Inject(FAVORITO_REPOSITORY)
-    private readonly favoritoRepo: IFavoritoRepository,
+    @Inject(FAVORITE_REPOSITORY)
+    private readonly favoriteRepo: IFavoriteRepository,
   ) {}
 
-  async execute(userId: string): Promise<Favorito[]> {
-    return this.favoritoRepo.getFavoritesByUser(userId);
+  async execute(userId: string): Promise<Favorite[]> {
+    return this.favoriteRepo.getFavoritesByUser(userId);
   }
 }

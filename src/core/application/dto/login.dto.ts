@@ -8,5 +8,5 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  contrasena: string;
+  password: string;
 }

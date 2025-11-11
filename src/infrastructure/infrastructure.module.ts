@@ -15,7 +15,7 @@ import { PrismaPropertyRepository } from './adapters/prisma-property.repository'
 import { PrismaPropertyTypeRepository } from './adapters/prisma-property-type.repository';
 import { PrismaPropertyImageRepository } from './adapters/prisma-property-image.repository';
 import { PrismaLocationRepository } from './adapters/prisma-location.repository';
-import { PrismaFavoritoRepository } from './adapters/prisma-favorite.repository'; 
+import { PrismaFavoriteRepository } from './adapters/prisma-favorite.repository'; 
 
 // HTTP Server
 import { AuthController } from './http-server/controllers/auth.controller';
@@ -37,7 +37,7 @@ import { PROPERTY_REPOSITORY } from 'src/core/domain/ports/property.repository';
 import { PROPERTY_TYPE_REPOSITORY } from 'src/core/domain/ports/property-type.repository';
 import { PROPERTY_IMAGE_REPOSITORY } from 'src/core/domain/ports/property-image.repository';
 import { LOCATION_REPOSITORY } from 'src/core/domain/ports/location.repository';
-import { FAVORITO_REPOSITORY } from 'src/core/domain/ports/favorite.repository';
+import { FAVORITE_REPOSITORY } from 'src/core/domain/ports/favorite.repository';
 import { FavoriteController } from './http-server/controllers/favorite.controller';
 
 const adaptersProviders = [
@@ -70,8 +70,8 @@ const adaptersProviders = [
     useClass: PrismaLocationRepository,
   },
   {
-    provide: FAVORITO_REPOSITORY,
-    useClass: PrismaFavoritoRepository,
+    provide: FAVORITE_REPOSITORY,
+    useClass: PrismaFavoriteRepository,
   },
 ];
 
@@ -114,7 +114,8 @@ const adaptersProviders = [
     LOCATION_REPOSITORY,
     PASSWORD_SERVICE,
     TOKEN_SERVICE,
-    FAVORITO_REPOSITORY,
+    FAVORITE_REPOSITORY,
+    DatabaseModule
   ],
 })
 export class InfrastructureModule { }
