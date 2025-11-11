@@ -1,15 +1,18 @@
 export class PropertyImage {
   id: string;
-  id_inmueble: string;
+  property_id: string;
   url: string;
-  numero?: number | null;
-  activo: boolean;
+  number?: number | null;
+  active: boolean;
 
   constructor(partial: Partial<PropertyImage>) {
-    Object.assign(this, partial);
+    Object.assign(this, {
+      ...partial,
+      active: partial.active ?? true,
+    });
   }
 
   isActive(): boolean {
-    return this.activo;
+    return this.active;
   }
 }

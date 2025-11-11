@@ -4,23 +4,23 @@ import { Type } from 'class-transformer';
 export class CreateLocationDto {
   @IsString()
   @IsOptional()
-  direccion?: string;
+  address?: string;
 
   @IsString()
   @IsOptional()
-  ciudad?: string;
+  city?: string;
 
   @IsString()
   @IsOptional()
-  barrio?: string;
+  neighborhood?: string;
 
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  latitud?: number;
+  latitude?: number;
 
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  longitud?: number;
+  longitude?: number;
 }

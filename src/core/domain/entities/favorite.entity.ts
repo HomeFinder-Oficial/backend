@@ -1,9 +1,10 @@
-export class PropertyType {
+export class Favorite {
   id: string;
-  type: string;
+  client_id: string;
+  property_id: string;
   active: boolean;
 
-  constructor(partial: Partial<PropertyType>) {
+  constructor(partial: Partial<Favorite>) {
     Object.assign(this, partial);
   }
 

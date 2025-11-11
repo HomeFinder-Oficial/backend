@@ -7,114 +7,111 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id          String                 @id @default(uuid()) @db.Char(36)
-  nombre      String                 @db.VarChar(100)
-  apellidos   String                 @db.VarChar(150)
-  email       String                 @unique(map: "email") @db.VarChar(150)
-  contrasena  String                 @db.VarChar(255)
-  activo      Boolean?               @default(true)
-  telefono    String?                @db.VarChar(20)
-  foto        String?                @db.VarChar(500)
-  id_rol      String?                @db.Char(36)
-  favoritos   Favorito[]             @relation("ClienteFavoritos")
-  propiedades Inmueble[]             @relation("PropietarioInmuebles")
-  metricas    MetricaAdministrador[]
-  rol         rol?                   @relation(fields: [id_rol], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usuario_ibfk_1")
+model admin_metrics {
+  id                    String    @id @db.Char(36)
+  active_users_count    Int?      @default(0)
+  properties_count      Int?      @default(0)
+  sold_properties_count Int?      @default(0)
+  created_at            DateTime? @default(now()) @db.DateTime(0)
+  updated_at            DateTime? @default(now()) @db.DateTime(0)
+  user_id               String    @db.Char(36)
+  active                Boolean?  @default(true)
+  user                  user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "admin_metrics_ibfk_1")
 
-  @@index([id_rol], map: "id_rol")
-  @@map("usuario")
+  @@index([user_id], map: "user_id")
 }
 
-model TipoInmueble {
-  id        String     @id @default(uuid()) @db.Char(36)
-  tipo      String     @db.VarChar(100)
-  activo    Boolean?   @default(true)
-  inmuebles Inmueble[]
+model favorite {
+  id          String   @id @db.Char(36)
+  client_id   String   @db.Char(36)
+  property_id String   @db.Char(36)
+  active      Boolean? @default(true)
+  user        user     @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorite_ibfk_1")
+  property    property @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorite_ibfk_2")
 
-  @@map("tipo_inmueble")
+  @@unique([client_id, property_id], map: "client_id")
+  @@index([property_id], map: "property_id")
 }
 
-model Ubicacion {
-  id        String     @id @default(uuid()) @db.Char(36)
-  direccion String?    @db.VarChar(255)
-  ciudad    String?    @db.VarChar(100)
-  barrio    String?    @db.VarChar(100)
-  latitud   Decimal?   @db.Decimal(10, 7)
-  longitud  Decimal?   @db.Decimal(10, 7)
-  activo    Boolean?   @default(true)
-  inmuebles Inmueble[]
-
-  @@map("ubicacion")
+model location {
+  id           String     @id @db.Char(36)
+  address      String?    @db.VarChar(255)
+  city         String?    @db.VarChar(100)
+  neighborhood String?    @db.VarChar(100)
+  latitude     Decimal?   @db.Decimal(10, 7)
+  longitude    Decimal?   @db.Decimal(10, 7)
+  active       Boolean?   @default(true)
+  property     property[]
 }
 
-model Inmueble {
-  id               String         @id @default(uuid()) @db.Char(36)
-  titulo           String         @db.VarChar(150)
-  descripcion      String?        @db.Text
-  precio           Decimal?       @db.Decimal(15, 2)
-  area_m2          Decimal?       @db.Decimal(10, 2)
-  habitaciones     Int?
-  banos            Int?
-  activo           Boolean?       @default(true)
-  id_propietario   String         @db.Char(36)
-  id_tipo_inmueble String         @db.Char(36)
-  id_ubicacion     String         @db.Char(36)
-  favoritos        Favorito[]
-  fotos            FotoInmueble[]
-  propietario      Usuario        @relation("PropietarioInmuebles", fields: [id_propietario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "inmueble_ibfk_1")
-  tipoInmueble     TipoInmueble   @relation(fields: [id_tipo_inmueble], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "inmueble_ibfk_2")
-  ubicacion        Ubicacion      @relation(fields: [id_ubicacion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "inmueble_ibfk_3")
+model property {
+  id               String                 @id @db.Char(36)
+  title            String                 @db.VarChar(150)
+  description      String?                @db.Text
+  price            Decimal?               @db.Decimal(15, 2)
+  area_m2          Decimal?               @db.Decimal(10, 2)
+  bedrooms         Int?
+  bathrooms        Int?
+  active           Boolean?               @default(true)
+  id_owner         String                 @db.Char(36)
+  property_type_id String                 @db.Char(36)
+  location_id      String                 @db.Char(36)
+  type_of_sale     property_type_of_sale?
+  favorite         favorite[]
+  user             user                   @relation(fields: [id_owner], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "property_ibfk_1")
+  property_type    property_type          @relation(fields: [property_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "property_ibfk_2")
+  location         location               @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "property_ibfk_3")
+  property_photo   property_photo[]
 
-  @@index([id_propietario], map: "id_propietario")
-  @@index([id_tipo_inmueble], map: "id_tipo_inmueble")
-  @@index([id_ubicacion], map: "id_ubicacion")
-  @@map("inmueble")
+  @@index([id_owner], map: "id_owner")
+  @@index([location_id], map: "location_id")
+  @@index([property_type_id], map: "property_type_id")
 }
 
-model FotoInmueble {
-  id          String   @id @default(uuid()) @db.Char(36)
-  id_inmueble String   @db.Char(36)
+model property_photo {
+  id          String   @id @db.Char(36)
+  property_id String   @db.Char(36)
   url         String   @db.VarChar(500)
-  numero      Int?
-  activo      Boolean? @default(true)
-  inmueble    Inmueble @relation(fields: [id_inmueble], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "foto_inmueble_ibfk_1")
+  number      Int?
+  active      Boolean? @default(true)
+  property    property @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "property_photo_ibfk_1")
 
-  @@index([id_inmueble], map: "id_inmueble")
-  @@map("foto_inmueble")
+  @@index([property_id], map: "property_id")
 }
 
-model Favorito {
-  id          String   @id @default(uuid()) @db.Char(36)
-  id_cliente  String   @db.Char(36)
-  id_inmueble String   @db.Char(36)
-  activo      Boolean? @default(true)
-  cliente     Usuario  @relation("ClienteFavoritos", fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorito_ibfk_1")
-  inmueble    Inmueble @relation(fields: [id_inmueble], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorito_ibfk_2")
-
-  @@unique([id_cliente, id_inmueble], map: "id_cliente")
-  @@index([id_inmueble], map: "id_inmueble")
-  @@map("favorito")
+model property_type {
+  id       String     @id @db.Char(36)
+  type     String     @db.VarChar(100)
+  active   Boolean?   @default(true)
+  property property[]
 }
 
-model MetricaAdministrador {
-  id                          String    @id @default(uuid()) @db.Char(36)
-  numero_usuarios_activos     Int?      @default(0)
-  numero_propiedades          Int?      @default(0)
-  numero_propiedades_vendidas Int?      @default(0)
-  fecha_creacion              DateTime? @default(now()) @db.DateTime(0)
-  fecha_actualizacion         DateTime? @default(now()) @updatedAt @db.DateTime(0)
-  id_usuario                  String    @db.Char(36)
-  activo                      Boolean?  @default(true)
-  usuario                     Usuario   @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "metricas_administrador_ibfk_1")
-
-  @@index([id_usuario], map: "id_usuario")
-  @@map("metricas_administrador")
+model role {
+  id     String   @id @db.Char(36)
+  name   String   @unique(map: "name") @db.VarChar(100)
+  active Boolean? @default(true)
+  user   user[]
 }
 
-model rol {
-  id       String    @id @db.Char(36)
-  nombre   String    @unique(map: "nombre") @db.VarChar(100)
-  activo   Boolean?  @default(true)
-  usuarios Usuario[]
+model user {
+  id            String          @id @db.Char(36)
+  first_name    String          @db.VarChar(100)
+  last_name     String          @db.VarChar(150)
+  email         String          @unique(map: "email") @db.VarChar(150)
+  password      String          @db.VarChar(255)
+  active        Boolean?        @default(true)
+  phone         String?         @db.VarChar(20)
+  photo         String?         @db.VarChar(500)
+  role_id       String?         @db.Char(36)
+  admin_metrics admin_metrics[]
+  favorite      favorite[]
+  property      property[]
+  role          role?           @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
+
+  @@index([role_id], map: "role_id")
+}
+
+enum property_type_of_sale {
+  sold
+  rented
 }

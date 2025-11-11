@@ -5,23 +5,23 @@ import { PropertyType } from 'src/core/domain/entities/property-type.entity';
 
 @Injectable()
 export class PrismaPropertyTypeRepository implements IPropertyTypeRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private mapPrismaPropertyTypeToEntity(prismaType: any): PropertyType {
     return new PropertyType({
       id: prismaType.id,
-      tipo: prismaType.tipo,
-      activo: prismaType.activo === null ? true : prismaType.activo,
+      type: prismaType.type,
+      active: prismaType.active === null ? true : prismaType.active,
     });
   }
 
   async findAll(): Promise<PropertyType[]> {
-    const types = await this.prisma.tipoInmueble.findMany();
+    const types = await this.prisma.property_type.findMany();
     return types.map((t) => this.mapPrismaPropertyTypeToEntity(t));
   }
 
   async findById(id: string): Promise<PropertyType | null> {
-    const type = await this.prisma.tipoInmueble.findUnique({
+    const type = await this.prisma.property_type.findUnique({
       where: { id },
     });
     return type ? this.mapPrismaPropertyTypeToEntity(type) : null;

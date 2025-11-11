@@ -6,6 +6,8 @@ import {
   IsPositive,
   Min,
   IsArray,
+  ValidateNested,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateLocationDto } from './create-location.dto';
@@ -13,17 +15,17 @@ import { CreateLocationDto } from './create-location.dto';
 export class CreatePropertyDto {
   @IsString()
   @IsNotEmpty()
-  titulo: string;
+  title: string;
 
   @IsString()
   @IsOptional()
-  descripcion?: string;
+  description?: string;
 
   @IsNumber()
   @IsPositive()
   @IsOptional()
   @Type(() => Number)
-  precio?: number;
+  price?: number;
 
   @IsNumber()
   @IsPositive()
@@ -35,24 +37,35 @@ export class CreatePropertyDto {
   @Min(0)
   @IsOptional()
   @Type(() => Number)
-  habitaciones?: number;
+  bedrooms?: number;
 
   @IsNumber()
   @Min(0)
   @IsOptional()
   @Type(() => Number)
-  banos?: number;
+  bathrooms?: number;
 
   @IsString()
   @IsNotEmpty()
-  id_tipo_inmueble: string;
+  property_type: string;
 
+  @IsString()
+  @IsNotEmpty()
+  id_owner: string;
+
+  @IsEnum(['sold', 'rented', null], {
+    message: 'type_of_sale debe ser "sold", "rented" o null',
+  })
   @IsOptional()
+  type_of_sale?: 'sold' | 'rented' | null;
+
+  @ValidateNested()
   @Type(() => CreateLocationDto)
-  ubicacion?: CreateLocationDto;
+  @IsOptional()
+  location?: CreateLocationDto;
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  fotos?: string[];
+  images?: string[];
 }
