@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PROPERTY_REPOSITORY, type IPropertyRepository } from 'src/core/domain/ports/property.repository';
+import {
+  PROPERTY_REPOSITORY,
+  type IPropertyRepository,
+} from 'src/core/domain/ports/property.repository';
 import type { Property } from 'src/core/domain/entities/property.entity';
 import type { FilterPropertyDto } from '../dto/filter-property.dto';
 
@@ -7,8 +10,8 @@ import type { FilterPropertyDto } from '../dto/filter-property.dto';
 export class SearchPropertiesUseCase {
   constructor(
     @Inject(PROPERTY_REPOSITORY)
-    private readonly propertyRepository: IPropertyRepository
-) {}
+    private readonly propertyRepository: IPropertyRepository,
+  ) {}
 
   async execute(filters: FilterPropertyDto): Promise<{
     data: Property[];

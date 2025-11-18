@@ -5,7 +5,7 @@ import { PropertyType } from 'src/core/domain/entities/property-type.entity';
 
 @Injectable()
 export class PrismaPropertyTypeRepository implements IPropertyTypeRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private mapPrismaPropertyTypeToEntity(prismaType: any): PropertyType {
     return new PropertyType({

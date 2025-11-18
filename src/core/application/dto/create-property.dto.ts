@@ -47,11 +47,7 @@ export class CreatePropertyDto {
 
   @IsString()
   @IsNotEmpty()
-  property_type: string;
-
-  @IsString()
-  @IsNotEmpty()
-  id_owner: string;
+  property_type_id: string;
 
   @IsEnum(['sold', 'rented', null], {
     message: 'type_of_sale debe ser "sold", "rented" o null',

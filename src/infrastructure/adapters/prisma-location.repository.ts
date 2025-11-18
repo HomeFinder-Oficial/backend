@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PrismaLocationRepository implements ILocationRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private mapPrismaLocationToEntity(prismaLocation: any): Location {
     return new Location({
@@ -62,6 +62,9 @@ export class PrismaLocationRepository implements ILocationRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.location.delete({ where: { id } });
+    await this.prisma.location.update({
+      where: { id },
+      data: { active: false },
+    });
   }
 }

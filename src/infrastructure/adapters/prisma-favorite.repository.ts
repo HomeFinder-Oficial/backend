@@ -3,9 +3,10 @@ import { PrismaService } from '../database/prisma.service';
 import type { IFavoriteRepository } from '../../core/domain/ports/favorite.repository';
 import { Favorite } from '../../core/domain/entities/favorite.entity';
 import { v4 as uuidv4 } from 'uuid';
+
 @Injectable()
 export class PrismaFavoriteRepository implements IFavoriteRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async addFavorite(userId: string, propertyId: string): Promise<Favorite> {
     const favorite = await this.prisma.favorite.create({

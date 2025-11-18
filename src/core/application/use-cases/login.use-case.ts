@@ -26,11 +26,6 @@ export class LoginUseCase {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    // Verificar si está activo
-    if (!user.isActive()) {
-      throw new UnauthorizedException('Usuario inactivo');
-    }
-
     // Verificar contraseña
     const isPasswordValid = await this.passwordService.compare(
       loginDto.password,
@@ -44,7 +39,10 @@ export class LoginUseCase {
     const payload = {
       sub: user.id,
       email: user.email,
-      role_id: user.role_id,
+      role: {
+        id: user.role?.id || null,
+        name: user.role?.name || null,
+      },
     };
     const access_token = await this.tokenService.generateToken(payload);
 

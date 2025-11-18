@@ -3,11 +3,12 @@ import { PrismaService } from '../database/prisma.service';
 import { IPropertyRepository } from 'src/core/domain/ports/property.repository';
 import { Property } from 'src/core/domain/entities/property.entity';
 import { FilterPropertyDto } from 'src/core/application/dto/filter-property.dto';
-import { PropertyMapper } from 'src/core/application/mappers/propertyMapper';
+import { v4 as uuidv4 } from 'uuid';
+import { PropertyMapper } from 'src/core/application/mappers/property.mapper';
 
 @Injectable()
 export class PrismaPropertyRepository implements IPropertyRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<Property[]> {
     const properties = await this.prisma.property.findMany({
@@ -15,7 +16,7 @@ export class PrismaPropertyRepository implements IPropertyRepository {
       include: {
         property_type: true,
         location: true,
-        property_photo: { orderBy: { number: 'asc' } },
+        property_photo: { where: { active: true }, orderBy: { number: 'asc' } },
       },
       orderBy: { id: 'desc' },
     });
@@ -26,21 +27,30 @@ export class PrismaPropertyRepository implements IPropertyRepository {
     const property = await this.prisma.property.findUnique({
       where: { id },
       include: {
-        user: { select: { id: true, first_name: true, last_name: true, email: true, phone: true, photo: true } },
         property_type: true,
         location: true,
-        property_photo: { orderBy: { number: 'asc' } },
+        property_photo: { where: { active: true }, orderBy: { number: 'asc' } },
       },
     });
     return property ? PropertyMapper.toDomain(property) : null;
   }
 
-  /**
-   * Este método ya no se usa en la creación, pero lo mantenemos
-   * para cumplir con la interfaz y permitir posibles usos futuros.
-   */
-  async create(): Promise<Property> {
-    throw new Error('Method not implemented: use CreatePropertyUseCase instead.');
+  async create(data: Partial<Property>): Promise<Property> {
+    const propertyToPersist = PropertyMapper.toPersistence({
+      ...data,
+      id: data.id ?? uuidv4(),
+    });
+
+    const created = await this.prisma.property.create({
+      data: propertyToPersist,
+      include: {
+        property_type: true,
+        location: true,
+        property_photo: { orderBy: { number: 'asc' } },
+      },
+    });
+
+    return PropertyMapper.toDomain(created);
   }
 
   async update(id: string, data: Partial<Property>): Promise<Property> {
@@ -48,10 +58,9 @@ export class PrismaPropertyRepository implements IPropertyRepository {
       where: { id },
       data: PropertyMapper.toPersistence(data),
       include: {
-        user: { select: { id: true, first_name: true, last_name: true, email: true, phone: true, photo: true } },
         property_type: true,
         location: true,
-        property_photo: { orderBy: { number: 'asc' } },
+        property_photo: { where: { active: true }, orderBy: { number: 'asc' } },
       },
     });
 
@@ -72,14 +81,20 @@ export class PrismaPropertyRepository implements IPropertyRepository {
   ): Promise<{ data: Property[]; total: number }> {
     const where: any = { active: true };
 
-    if (filters.location) where.location = { city: { contains: filters.location, mode: 'insensitive' } };
+    if (filters.location)
+      where.location = {
+        city: { contains: filters.location, mode: 'insensitive' },
+      };
     if (filters.minPrice || filters.maxPrice) {
       where.price = {};
       if (filters.minPrice) where.price.gte = filters.minPrice;
       if (filters.maxPrice) where.price.lte = filters.maxPrice;
     }
     if (filters.bedrooms) where.bedrooms = filters.bedrooms;
-    if (filters.type) where.property_type = { type: { contains: filters.type, mode: 'insensitive' } };
+    if (filters.type)
+      where.property_type = {
+        type: { contains: filters.type, mode: 'insensitive' },
+      };
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.property.findMany({
@@ -87,7 +102,6 @@ export class PrismaPropertyRepository implements IPropertyRepository {
         skip,
         take: limit,
         include: {
-          user: { select: { id: true, first_name: true, last_name: true, email: true, phone: true, photo: true } },
           property_type: true,
           location: true,
           property_photo: { orderBy: { number: 'asc' } },

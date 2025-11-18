@@ -9,11 +9,11 @@ import {
 export class RegisterDto {
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  first_name: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  last_name: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -30,5 +30,5 @@ export class RegisterDto {
 
   @IsString()
   @IsOptional()
-  roleId?: string;
+  role_id?: string;
 }

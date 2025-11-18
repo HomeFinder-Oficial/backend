@@ -8,6 +8,11 @@ export class AuthResponseDto {
     active: boolean;
     phone?: string | null;
     role_id?: string | null;
+    role?: {
+      id: string;
+      name: string;
+      active: boolean;
+    } | null;
     photo?: string | null;
   };
 }
