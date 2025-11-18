@@ -1,3 +1,9 @@
+import { Favorite } from './favorite.entity';
+import { Location } from './location.entity';
+import { PropertyImage } from './property-image.entity';
+import { PropertyType } from './property-type.entity';
+import { User } from './user.entity';
+
 export class Property {
   id: string;
   title: string;
@@ -11,11 +17,11 @@ export class Property {
   property_type_id: string;
   location_id: string;
   type_of_sale?: 'sold' | 'rented' | null;
-  user?: any;
-  property_type?: any;
-  location?: any;
-  favorite?: any[];
-  property_photo?: any[];
+  user?: User;
+  property_type?: PropertyType;
+  location?: Location;
+  favorite?: Favorite[];
+  property_photo?: PropertyImage[];
 
   constructor(partial: Partial<Property>) {
     Object.assign(this, {

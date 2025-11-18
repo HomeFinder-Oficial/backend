@@ -15,12 +15,16 @@ import { PrismaPropertyRepository } from './adapters/prisma-property.repository'
 import { PrismaPropertyTypeRepository } from './adapters/prisma-property-type.repository';
 import { PrismaPropertyImageRepository } from './adapters/prisma-property-image.repository';
 import { PrismaLocationRepository } from './adapters/prisma-location.repository';
-import { PrismaFavoriteRepository } from './adapters/prisma-favorite.repository'; 
+import { PrismaFavoriteRepository } from './adapters/prisma-favorite.repository';
+import { PrismaRoleRepository } from './adapters/prisma-role.repository';
 
 // HTTP Server
 import { AuthController } from './http-server/controllers/auth.controller';
 import { UserController } from './http-server/controllers/user.controller';
 import { PropertyController } from './http-server/controllers/property.controller';
+import { FavoriteController } from './http-server/controllers/favorite.controller';
+import { RoleController } from './http-server/controllers/role.controller';
+import { PropertyTypeController } from './http-server/controllers/property-type.controller';
 import { JwtStrategy } from './http-server/strategies/jwt.strategy';
 import { JwtAuthGuard } from './http-server/guards/jwt-auth.guard';
 
@@ -31,14 +35,16 @@ import { CoreModule } from '../core/core.module';
 import { USER_REPOSITORY } from '../core/domain/ports/user.repository';
 import { PASSWORD_SERVICE } from '../core/domain/ports/password.service';
 import { TOKEN_SERVICE } from '../core/domain/ports/token.service';
-import { WinstonModule } from 'nest-winston';
-import { winstonConfig } from './config/logger.config';
 import { PROPERTY_REPOSITORY } from 'src/core/domain/ports/property.repository';
 import { PROPERTY_TYPE_REPOSITORY } from 'src/core/domain/ports/property-type.repository';
 import { PROPERTY_IMAGE_REPOSITORY } from 'src/core/domain/ports/property-image.repository';
 import { LOCATION_REPOSITORY } from 'src/core/domain/ports/location.repository';
 import { FAVORITE_REPOSITORY } from 'src/core/domain/ports/favorite.repository';
-import { FavoriteController } from './http-server/controllers/favorite.controller';
+import { ROLE_REPOSITORY } from 'src/core/domain/ports/role.repository';
+
+// Logger
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './config/logger.config';
 
 const adaptersProviders = [
   {
@@ -73,6 +79,7 @@ const adaptersProviders = [
     provide: FAVORITE_REPOSITORY,
     useClass: PrismaFavoriteRepository,
   },
+  { provide: ROLE_REPOSITORY, useClass: PrismaRoleRepository },
 ];
 
 @Module({
@@ -97,7 +104,14 @@ const adaptersProviders = [
     DatabaseModule,
     CoreModule,
   ],
-  controllers: [AuthController, UserController, PropertyController, FavoriteController],
+  controllers: [
+    AuthController,
+    UserController,
+    PropertyController,
+    FavoriteController,
+    RoleController,
+    PropertyTypeController,
+  ],
   providers: [
     ...adaptersProviders,
     JwtStrategy,
@@ -112,10 +126,11 @@ const adaptersProviders = [
     PROPERTY_TYPE_REPOSITORY,
     PROPERTY_IMAGE_REPOSITORY,
     LOCATION_REPOSITORY,
+    FAVORITE_REPOSITORY,
+    ROLE_REPOSITORY,
     PASSWORD_SERVICE,
     TOKEN_SERVICE,
-    FAVORITE_REPOSITORY,
-    DatabaseModule
+    DatabaseModule,
   ],
 })
-export class InfrastructureModule { }
+export class InfrastructureModule {}

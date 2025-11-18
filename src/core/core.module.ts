@@ -15,6 +15,9 @@ import { SearchPropertiesUseCase } from './application/use-cases/search-properti
 import { AddFavoriteUseCase } from './application/use-cases/add-favorite.use-case';
 import { GetUserFavoritesUseCase } from './application/use-cases/get-user-favorites.use-case';
 import { RemoveFavoriteUseCase } from './application/use-cases/remove-favorite.use-case';
+import { GetUserByIdUseCase } from './application/use-cases/get-user-by-id.use-case';
+import { GetAllRolesUseCase } from './application/use-cases/get-all-roles.use-case';
+import { GetAllPropertyTypesUseCase } from './application/use-cases/get-all-property-types.use-case';
 
 @Module({
   imports: [forwardRef(() => InfrastructureModule)],
@@ -25,8 +28,10 @@ import { RemoveFavoriteUseCase } from './application/use-cases/remove-favorite.u
     ValidateUserUseCase,
     // Users
     GetAllUsersUseCase,
+    GetUserByIdUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
+    GetAllRolesUseCase,
     // Properties
     CreatePropertyUseCase,
     GetAllPropertiesUseCase,
@@ -37,6 +42,7 @@ import { RemoveFavoriteUseCase } from './application/use-cases/remove-favorite.u
     AddFavoriteUseCase,
     GetUserFavoritesUseCase,
     RemoveFavoriteUseCase,
+    GetAllPropertyTypesUseCase,
   ],
   exports: [
     // Auth
@@ -45,8 +51,10 @@ import { RemoveFavoriteUseCase } from './application/use-cases/remove-favorite.u
     ValidateUserUseCase,
     // Users
     GetAllUsersUseCase,
+    GetUserByIdUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
+    GetAllRolesUseCase,
     // Properties
     CreatePropertyUseCase,
     GetAllPropertiesUseCase,
@@ -56,7 +64,8 @@ import { RemoveFavoriteUseCase } from './application/use-cases/remove-favorite.u
     SearchPropertiesUseCase,
     AddFavoriteUseCase,
     GetUserFavoritesUseCase,
-    RemoveFavoriteUseCase
+    RemoveFavoriteUseCase,
+    GetAllPropertyTypesUseCase,
   ],
 })
 export class CoreModule {}

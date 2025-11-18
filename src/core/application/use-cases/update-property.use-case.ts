@@ -26,20 +26,31 @@ export class UpdatePropertyUseCase {
     private readonly propertyTypeRepository: IPropertyTypeRepository,
     @Inject(PROPERTY_IMAGE_REPOSITORY)
     private readonly imageRepository: IPropertyImageRepository,
-  ) { }
+  ) {}
 
   async execute(
     propertyId: string,
     dto: UpdatePropertyDto,
-    userId: string,
+    ownerId: string,
   ): Promise<Property> {
     const property = await this.propertyRepository.findById(propertyId);
     if (!property) {
-      throw new NotFoundException('Property not found');
+      throw new NotFoundException('Imueble no encontrado');
     }
 
-    if (!property.belongsTo(userId)) {
-      throw new ForbiddenException('You are not allowed to update this property');
+    if (!property.belongsTo(ownerId)) {
+      throw new ForbiddenException(
+        'No tienes permiso para actualizar este inmueble',
+      );
+    }
+
+    if (dto.property_type_id) {
+      const typeExists = await this.propertyTypeRepository.findById(
+        dto.property_type_id,
+      );
+      if (!typeExists) {
+        throw new NotFoundException('Tipo de inmueble no encontrado');
+      }
     }
 
     if (dto.location) {
@@ -66,23 +77,17 @@ export class UpdatePropertyUseCase {
       }
     }
 
-    if (dto.property_type_id) {
-      const typeExists = await this.propertyTypeRepository.findById(
-        dto.property_type_id,
-      );
-      if (!typeExists) {
-        throw new NotFoundException('Property type not found');
-      }
-    }
-
     const updatedProperty = await this.propertyRepository.update(propertyId, {
+      id: propertyId,
       title: dto.title,
       description: dto.description,
       price: dto.price,
       area_m2: dto.area_m2,
       bedrooms: dto.bedrooms,
       bathrooms: dto.bathrooms,
+      id_owner: ownerId,
       property_type_id: dto.property_type_id,
+      location_id: property.location_id,
     });
 
     return updatedProperty;

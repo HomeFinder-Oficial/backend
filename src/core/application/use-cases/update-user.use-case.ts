@@ -13,7 +13,7 @@ export class UpdateUserUseCase {
 
     @Inject(PASSWORD_SERVICE)
     private readonly passwordService: IPasswordService,
-  ) { }
+  ) {}
 
   async execute(id: string, data: Partial<User>): Promise<User> {
     const existing = await this.userRepository.findById(id);

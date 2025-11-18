@@ -3,9 +3,10 @@ import { PrismaService } from '../database/prisma.service';
 import { IPropertyImageRepository } from 'src/core/domain/ports/property-image.repository';
 import { PropertyImage } from 'src/core/domain/entities/property-image.entity';
 import { v4 as uuidv4 } from 'uuid';
+
 @Injectable()
 export class PrismaPropertyImageRepository implements IPropertyImageRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private mapPrismaPropertyImageToEntity(prismaImage: any): PropertyImage {
     return new PropertyImage({
@@ -19,7 +20,7 @@ export class PrismaPropertyImageRepository implements IPropertyImageRepository {
 
   async findByProperty(property_id: string): Promise<PropertyImage[]> {
     const photos = await this.prisma.property_photo.findMany({
-      where: { property_id },
+      where: { property_id, active: true },
       orderBy: { number: 'asc' },
     });
     return photos.map((p) => this.mapPrismaPropertyImageToEntity(p));
@@ -39,12 +40,16 @@ export class PrismaPropertyImageRepository implements IPropertyImageRepository {
   }
 
   async deleteByProperty(property_id: string): Promise<void> {
-    await this.prisma.property_photo.deleteMany({
+    await this.prisma.property_photo.updateMany({
       where: { property_id },
+      data: { active: false },
     });
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.property_photo.delete({ where: { id } });
+    await this.prisma.property_photo.update({
+      where: { id },
+      data: { active: false },
+    });
   }
 }
