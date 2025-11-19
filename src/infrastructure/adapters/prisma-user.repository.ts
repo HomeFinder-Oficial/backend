@@ -7,11 +7,12 @@ import { UserMapper } from 'src/core/application/mappers/user.mapper';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: { email, active: true },
+      include: { role: true },
     });
     return user ? UserMapper.toDomain(user) : null;
   }
@@ -19,6 +20,7 @@ export class PrismaUserRepository implements IUserRepository {
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: { role: true },
     });
     return user ? UserMapper.toDomain(user) : null;
   }
@@ -31,6 +33,7 @@ export class PrismaUserRepository implements IUserRepository {
 
     const createdUser = await this.prisma.user.create({
       data: userToPersist,
+      include: { role: true },
     });
 
     return UserMapper.toDomain(createdUser);
@@ -38,7 +41,7 @@ export class PrismaUserRepository implements IUserRepository {
 
   async existsByEmail(email: string): Promise<boolean> {
     const count = await this.prisma.user.count({
-      where: { email },
+      where: { email, active: true },
     });
     return count > 0;
   }
@@ -46,10 +49,10 @@ export class PrismaUserRepository implements IUserRepository {
   async findAll(page: number, limit: number): Promise<User[]> {
     const skip = (page - 1) * limit;
     const users = await this.prisma.user.findMany({
-      where: { active: true },
       skip,
       take: limit,
       orderBy: { first_name: 'asc' },
+      include: { role: true },
     });
     return users.map(UserMapper.toDomain);
   }
@@ -64,6 +67,7 @@ export class PrismaUserRepository implements IUserRepository {
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: userToUpdate,
+      include: { role: true },
     });
 
     return UserMapper.toDomain(updatedUser);

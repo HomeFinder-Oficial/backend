@@ -13,11 +13,10 @@ export class RegisterUseCase {
     private readonly userRepository: IUserRepository,
     @Inject(PASSWORD_SERVICE)
     private readonly passwordService: IPasswordService,
-  ) { }
+  ) {}
 
   private readonly DEFAULT_AVATAR =
     'https://e7.pngegg.com/pngimages/348/800/png-clipart-man-wearing-blue-shirt-illustration-computer-icons-avatar-user-login-avatar-blue-child-thumbnail.png';
-
 
   async execute(registerDto: RegisterDto): Promise<User> {
     // Verificar si el email ya existe

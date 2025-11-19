@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreatePropertyUseCase } from 'src/core/application/use-cases/create-property.use-case';
 import { GetAllPropertiesUseCase } from 'src/core/application/use-cases/get-all-properties.use-case';
@@ -19,8 +20,11 @@ import { CreatePropertyDto } from 'src/core/application/dto/create-property.dto'
 import { UpdatePropertyDto } from 'src/core/application/dto/update-property.dto';
 import { SearchPropertiesUseCase } from 'src/core/application/use-cases/search-properties.use-case';
 import { FilterPropertyDto } from 'src/core/application/dto/filter-property.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { RolesGuard } from '../guards/roles.guard';
 
 @Controller('properties')
+@UseGuards(RolesGuard)
 export class PropertyController {
   constructor(
     private readonly createPropertyUseCase: CreatePropertyUseCase,
@@ -29,7 +33,7 @@ export class PropertyController {
     private readonly updatePropertyUseCase: UpdatePropertyUseCase,
     private readonly deletePropertyUseCase: DeletePropertyUseCase,
     private readonly searchPropertiesUseCase: SearchPropertiesUseCase,
-  ) { }
+  ) {}
 
   @Public()
   @Get()
@@ -62,6 +66,7 @@ export class PropertyController {
   }
 
   @Post()
+  @Roles('admin', 'owner')
   async create(
     @Body() data: CreatePropertyDto,
     @CurrentUser('id') userId: string,
@@ -74,6 +79,7 @@ export class PropertyController {
   }
 
   @Put(':id')
+  @Roles('admin', 'owner')
   async update(
     @Param('id') id: string,
     @Body() data: UpdatePropertyDto,
@@ -87,6 +93,7 @@ export class PropertyController {
   }
 
   @Delete(':id')
+  @Roles('admin', 'owner')
   async remove(@Param('id') id: string, @CurrentUser('id') userId: string) {
     await this.deletePropertyUseCase.execute(id, userId);
     return {

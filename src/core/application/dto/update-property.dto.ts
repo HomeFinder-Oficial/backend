@@ -5,6 +5,7 @@ import {
   IsPositive,
   Min,
   IsArray,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateLocationDto } from './create-location.dto';
@@ -49,6 +50,12 @@ export class UpdatePropertyDto {
   @IsString()
   @IsOptional()
   property_type_id?: string;
+
+  @IsEnum(['sold', 'rented', null], {
+    message: 'type_of_sale debe ser "sold", "rented" o null',
+  })
+  @IsOptional()
+  type_of_sale?: 'sold' | 'rented' | null;
 
   @IsOptional()
   @Type(() => CreateLocationDto)

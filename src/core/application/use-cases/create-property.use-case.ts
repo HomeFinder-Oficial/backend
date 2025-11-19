@@ -1,82 +1,72 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePropertyDto } from '../dto/create-property.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { IPropertyRepository } from 'src/core/domain/ports/property.repository';
+import { PROPERTY_REPOSITORY } from 'src/core/domain/ports/property.repository';
+import type { ILocationRepository } from 'src/core/domain/ports/location.repository';
+import { LOCATION_REPOSITORY } from 'src/core/domain/ports/location.repository';
+import type { IPropertyTypeRepository } from 'src/core/domain/ports/property-type.repository';
+import { PROPERTY_TYPE_REPOSITORY } from 'src/core/domain/ports/property-type.repository';
+import type { IPropertyImageRepository } from 'src/core/domain/ports/property-image.repository';
+import { PROPERTY_IMAGE_REPOSITORY } from 'src/core/domain/ports/property-image.repository';
 import { Property } from 'src/core/domain/entities/property.entity';
-import { PropertyMapper } from '../mappers/propertyMapper';
-import { v4 as uuidv4 } from 'uuid';
-import { PrismaService } from 'src/infrastructure/database/prisma.service';
+import { CreatePropertyDto } from '../dto/create-property.dto';
 
 @Injectable()
 export class CreatePropertyUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PROPERTY_REPOSITORY)
+    private readonly propertyRepository: IPropertyRepository,
+    @Inject(LOCATION_REPOSITORY)
+    private readonly locationRepository: ILocationRepository,
+    @Inject(PROPERTY_TYPE_REPOSITORY)
+    private readonly propertyTypeRepository: IPropertyTypeRepository,
+    @Inject(PROPERTY_IMAGE_REPOSITORY)
+    private readonly imageRepository: IPropertyImageRepository,
+  ) {}
 
   async execute(dto: CreatePropertyDto, ownerId: string): Promise<Property> {
-    return this.prisma.$transaction(async (tx) => {
-      // 1️⃣ Crear ubicación
-      const location = dto.location
-        ? await tx.location.create({
-            data: {
-              id: uuidv4(),
-              address: dto.location.address ?? null,
-              city: dto.location.city ?? null,
-              neighborhood: dto.location.neighborhood ?? null,
-              latitude: dto.location.latitude ?? null,
-              longitude: dto.location.longitude ?? null,
-              active: true,
-            },
-          })
-        : null;
+    const typeExists = await this.propertyTypeRepository.findById(
+      dto.property_type_id,
+    );
+    if (!typeExists) {
+      throw new NotFoundException('Tipo de inmueble no encontrado');
+    }
 
-      // 2️⃣ Crear o reutilizar tipo de propiedad
-      const propertyType =
-        (await tx.property_type.findFirst({
-          where: { type: dto.property_type, active: true },
-        })) ||
-        (await tx.property_type.create({
-          data: { id: uuidv4(), type: dto.property_type, active: true },
-        }));
+    const location = await this.locationRepository.create({
+      address: dto.location?.address,
+      city: dto.location?.city,
+      neighborhood: dto.location?.neighborhood,
+      latitude: dto.location?.latitude,
+      longitude: dto.location?.longitude,
+      active: true,
+    });
 
-      // 3️⃣ Crear propiedad principal (incluye type_of_sale)
-      const property = await tx.property.create({
-        data: {
-          id: uuidv4(),
-          title: dto.title,
-          description: dto.description ?? null,
-          price: dto.price ?? null,
-          area_m2: dto.area_m2 ?? null,
-          bedrooms: dto.bedrooms ?? null,
-          bathrooms: dto.bathrooms ?? null,
-          active: true,
-          id_owner: ownerId,
-          property_type_id: propertyType.id,
-          location_id: location?.id!,
-          type_of_sale: dto.type_of_sale ?? null,
-        },
-      });
+    const property = await this.propertyRepository.create({
+      title: dto.title,
+      description: dto.description,
+      price: dto.price,
+      area_m2: dto.area_m2,
+      bedrooms: dto.bedrooms,
+      bathrooms: dto.bathrooms,
+      type_of_sale: dto.type_of_sale,
+      active: true,
+      id_owner: ownerId,
+      property_type_id: dto.property_type_id,
+      location_id: location.id,
+    });
 
-      // 4️⃣ Crear fotos
-      if (dto.images?.length) {
-        await tx.property_photo.createMany({
-          data: dto.images.map((url, index) => ({
-            id: uuidv4(),
-            property_id: property.id,
-            url,
-            number: index + 1,
-            active: true,
-          })),
+    if (dto.images && dto.images.length > 0) {
+      for (let i = 0; i < dto.images.length; i++) {
+        await this.imageRepository.create({
+          property_id: property.id,
+          url: dto.images[i],
+          number: i + 1,
         });
       }
+    }
 
-      // 5️⃣ Consultar y retornar la propiedad completa
-      const fullProperty = await tx.property.findUnique({
-        where: { id: property.id },
-        include: {
-          property_type: true,
-          location: true,
-          property_photo: { orderBy: { number: 'asc' } },
-        },
-      });
-
-      return PropertyMapper.toDomain(fullProperty!);
-    });
+    const completeProperty = await this.propertyRepository.findById(
+      property.id,
+    );
+    return completeProperty!;
   }
 }
