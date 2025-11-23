@@ -80,14 +80,15 @@ model property_photo {
 }
 
 model property_type {
-  id       String     @id @db.Char(36)
-  type     String     @db.VarChar(100)
-  active   Boolean?   @default(true)
-  property property[]
+  id           String     @id @db.Char(36)
+  type         String     @db.VarChar(100)
+  active       Boolean?   @default(true)
+  type_of_sale String?    @db.VarChar(100)
+  property     property[]
 }
 
 model role {
-  id     String   @id @db.Char(36)
+  id     String   @id @default(dbgenerated("(uuid())")) @db.Char(36)
   name   String   @unique(map: "name") @db.VarChar(100)
   active Boolean? @default(true)
   user   user[]
