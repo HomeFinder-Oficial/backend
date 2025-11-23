@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, Min } from 'class-validator';
+import { IsOptional, IsString, IsNumber, Min, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class FilterPropertyDto {
@@ -39,4 +39,11 @@ export class FilterPropertyDto {
   @IsNumber()
   @Min(1)
   limit?: number;
+
+  @IsOptional()
+  @IsEnum(['sold', 'rented'], {
+    message: 'typeSale must be sold or rented',
+  })
+  typeSale?: 'sold' | 'rented';
+
 }

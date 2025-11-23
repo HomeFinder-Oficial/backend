@@ -8,7 +8,7 @@ import { PropertyMapper } from 'src/core/application/mappers/property.mapper';
 
 @Injectable()
 export class PrismaPropertyRepository implements IPropertyRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAll(): Promise<Property[]> {
     const properties = await this.prisma.property.findMany({
@@ -85,16 +85,23 @@ export class PrismaPropertyRepository implements IPropertyRepository {
       where.location = {
         city: { contains: filters.location, mode: 'insensitive' },
       };
+
     if (filters.minPrice || filters.maxPrice) {
       where.price = {};
       if (filters.minPrice) where.price.gte = filters.minPrice;
       if (filters.maxPrice) where.price.lte = filters.maxPrice;
     }
+
     if (filters.bedrooms) where.bedrooms = filters.bedrooms;
+
     if (filters.type)
       where.property_type = {
         type: { contains: filters.type, mode: 'insensitive' },
       };
+
+    if (filters.typeSale) {
+      where.type_of_sale = filters.typeSale;
+    }
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.property.findMany({
